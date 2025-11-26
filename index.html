@@ -28,6 +28,29 @@
             text-align: center;
             margin-bottom: 40px;
         }
+        .title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .title-image {
+            max-width: 350px;
+            width: 100%;
+        }
+        #welcome-message {
+            font-size: 2em;
+            color: var(--ink);
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .welcome-subtext {
+            font-size: 0.9em;
+            color: var(--muted-ink);
+            text-align: center;
+            margin-top: 4px;
+        }
         .line-group {
             margin-bottom: 20px;
         }
@@ -112,17 +135,45 @@
             flex-direction: column;
             animation: fadeIn 0.3s ease-out;
             min-width: 400px;
+            position: relative; /* 닫기 버튼을 위한 position-context */
+            padding: 20px;
         }
-        .modal-header {
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--muted-ink);
+            font-size: 2.5em;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .modal-character-info {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--stroke);
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .modal-title {
-            font-size: 1.5em;
+        #modal-character-image {
+            width: 300px; /* 이미지 크기 조절 */
+            height: 300px;
+            border-radius: 20px;
+            border: 3px solid var(--stroke);
+            object-fit: cover;
+        }
+        #modal-title-span {
+            font-size: 1.8em;
             font-weight: bold;
+        }
+        .font-size-control-group-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            padding: 0 20px 10px 20px; /* 좌우 패딩 및 아래쪽 여백 */
+            box-sizing: border-box;
         }
         .font-size-control-group {
             display: flex;
@@ -162,18 +213,10 @@
             min-width: 2ch;
             text-align: center;
         }
-        .modal-close-btn {
-            background: none;
-            border: none;
-            color: var(--muted-ink);
-            font-size: 2em;
-            line-height: 1;
-            cursor: pointer;
-        }
         .modal-content {
             display: flex;
             gap: 20px;
-            padding: 20px;
+            padding: 0; /* 위쪽 padding은 popup-modal에서 처리 */
             flex: 1 1 auto;
             min-height: 0;
         }
@@ -279,8 +322,15 @@
         }
         .name-entry-modal h2 {
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 5px; /* 여백 줄임 */
             color: var(--ink);
+            font-size: 1.5em;
+        }
+        .streamer-guidance {
+            font-size: 1em; /* h2 폰트 크기의 약 50% */
+            color: darkgreen;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
         .name-entry-modal input {
             width: 100%;
@@ -305,21 +355,48 @@
             width: 100%;
             transition: background-color 0.2s;
         }
+        .image-button.submitted {
+            cursor: not-allowed;
+            pointer-events: none;
+            position: relative;
+        }
+        .image-button.submitted .image-wrapper {
+            filter: grayscale(80%);
+            opacity: 0.6;
+        }
+        .image-button.submitted::after {
+            content: '✔';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 24px;
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--bg);
+        }
         .name-entry-modal button:hover {
             background-color: #26a26a;
+        }
+        #confirm-final-btn:disabled {
+            background-color: #555;
+            cursor: wait;
         }
     </style>
 </head>
 <body>
     <div class="container" id="main-container">
-        <h1>첫인상 현인상</h1>
+        <div class="title-container">
+        <img src="assets/title.png" alt="첫인상 현인상" class="title-image">
+        <span id="welcome-message"></span>
+        <p class="welcome-subtext"></p>
+    </div>
         <!-- Content will be dynamically generated here -->
     </div>
 
     <!-- Name Entry Modal -->
-    <div id="name-entry-veil" class="modal-veil visible">
+    <div id="name-entry-veil" class="modal-veil">
         <div class="name-entry-modal">
             <h2>이름을 입력해주세요</h2>
+            <p class="streamer-guidance">스트리머는 본인 숲 아이디를 입력하세요</p>
             <input type="text" id="name-input" placeholder="이름">
             <button id="name-confirm-btn">확인</button>
         </div>
@@ -328,17 +405,18 @@
     <!-- Modal Structure -->
     <div id="modal-veil" class="modal-veil">
         <div class="popup-modal">
-            <div class="modal-header">
-                <span class="modal-title" id="modal-title-span"></span>
-                <div class="font-size-control-group">
-                    <span class="font-size-label">폰트사이즈 :</span>
-                    <div class="font-size-controller">
-                        <button id="font-minus-btn">-</button>
-                        <span id="font-size-display">15</span>
-                        <button id="font-plus-btn">+</button>
-                    </div>
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <div class="modal-character-info">
+                <img id="modal-character-image" src="" alt="Character Image">
+                <span id="modal-title-span"></span>
+            </div>
+            <div class="font-size-control-group-wrapper">
+                <span class="font-size-label">폰트사이즈 :</span>
+                <div class="font-size-controller">
+                    <button id="font-minus-btn">-</button>
+                    <span id="font-size-display">15</span>
+                    <button id="font-plus-btn">+</button>
                 </div>
-                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-content">
                 <div class="text-field-group">
@@ -369,11 +447,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbxaDPvLCYR3DY4OxXD7ce2pgcu2z6jkLnz7zJQNPiSJ-SnCo-Bi8lWb8PfLjvufr2uFFA/exec';
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9LhRulSzsN_Yx7u-waO1p0qpi-3C_54PEorTR_7OUIPaw6p1Bmkx7PC1cQpzAPSC80Q/exec';
             let userDisplayName = '';
 
             const nameMappings = [
-                { sname: "", key: "" },
+                { sname: "빕어", key: "bver99" },
+                { sname: "한세긴", key: "rose0957" },
+                { sname: "송밤", key: "s07o24" },
+                { sname: "나비", key: "navixx" },
+                { sname: "다니얀", key: "daniyan1030" },
+                { sname: "밤베", key: "bambe53" },
+                { sname: "밤새나", key: "bamsaena" },
+                { sname: "요코링", key: "yokoring03" },
+                { sname: "윰로로", key: "yumroro" },
+                { sname: "찌로", key: "ch1ch1r0" },
+                { sname: "크앙희", key: "9wang2" },
+                { sname: "프하", key: "peuhaha" },
+                { sname: "호발", key: "hobal115end" },
+                { sname: "공도리", key: "swcmnb67" },
+                { sname: "도라희", key: "doraheee" },
+                { sname: "소호", key: "d0hxe823" },
+                { sname: "한세현", key: "kangturtle" },
             ];
 
             const lineData = [
@@ -388,11 +482,43 @@
             const nameInput = document.getElementById('name-input');
             const nameConfirmBtn = document.getElementById('name-confirm-btn');
 
+            // 제출 완료 상태를 UI에 업데이트하는 함수
+            function updateSubmittedStatus() {
+                if (!userDisplayName || userDisplayName.toLowerCase() === 'dev') return;
+
+                document.querySelectorAll('.image-button').forEach(button => {
+                    const characterName = button.dataset.name;
+                    const submittedKey = `submitted_${userDisplayName}_${characterName}`;
+                    try {
+                        if (localStorage.getItem(submittedKey)) {
+                            button.classList.add('submitted');
+                        } else {
+                            button.classList.remove('submitted');
+                        }
+                    } catch (e) {
+                        console.error("Local storage is unavailable.", e);
+                    }
+                });
+            }
+
             function initializeUser(name) {
-                userDisplayName = name;
-                const mapping = nameMappings.find(m => m.key.toLowerCase() === name.toLowerCase());
+                const welcomeMessage = document.getElementById('welcome-message');
+                const welcomeSubtext = document.querySelector('.welcome-subtext');
+                let finalName = name;
+                const mapping = nameMappings.find(m => m.key && m.key.toLowerCase() === name.toLowerCase());
+                
                 if (mapping && mapping.sname) {
-                    userDisplayName = mapping.sname;
+                    finalName = mapping.sname;
+                }
+                userDisplayName = finalName;
+
+                if (finalName && welcomeMessage && welcomeSubtext) {
+                    welcomeMessage.textContent = `( ${finalName} )`;
+                    if (finalName.toLowerCase() === 'dev') {
+                        welcomeSubtext.textContent = '';
+                    } else {
+                        welcomeSubtext.textContent = '클릭 시 입력한 내용 확인';
+                    }
                 }
 
                 if (name.toLowerCase() !== 'dev') {
@@ -403,6 +529,7 @@
                     }
                 }
                 nameEntryVeil.classList.remove('visible');
+                updateSubmittedStatus(); // 유저 초기화 후 제출 상태 업데이트
             }
 
             function checkUser() {
@@ -434,8 +561,6 @@
                 }
             });
             
-            checkUser();
-
             function createSubgroupHTML(name) {
                 const placeholderUrl = `https://via.placeholder.com/128/1a1d24/e7eaf0?text=${name}`;
                 return `
@@ -459,6 +584,8 @@
                 const allLinesHTML = lineData.map(createLineGroupHTML).join('<hr class="line-separator">');
                 mainContainer.innerHTML += allLinesHTML;
             }
+
+            checkUser(); // DOM 생성 후 유저 확인
 
             const modalVeil = document.getElementById('modal-veil');
             const popupModal = document.querySelector('.popup-modal');
@@ -502,12 +629,34 @@
 
             const resizeObserver = new ResizeObserver(syncModalSize);
 
+            const modalCharacterImage = document.getElementById('modal-character-image');
+
             function openModal(name) {
+                if (!userDisplayName) {
+                    alert('먼저 이름을 입력해주세요.');
+                    nameEntryVeil.classList.add('visible');
+                    return;
+                }
+
                 activeName = name;
+                
+                // Set character image
+                const imageUrl = `./assets/${name}.png`;
+                const placeholderUrl = `https://via.placeholder.com/150/1a1d24/e7eaf0?text=${name}`;
+                modalCharacterImage.src = imageUrl;
+                modalCharacterImage.onerror = () => {
+                    modalCharacterImage.onerror = null;
+                    modalCharacterImage.src = placeholderUrl;
+                };
+
+                // Set character name
                 modalTitleSpan.textContent = name;
+                
+                // Reset text fields
                 firstImpressionText.value = '';
                 currentImpressionText.value = '';
-                updateFontSize(15);
+                // 폰트 사이즈 초기화 대신 현재 설정된 폰트 사이즈 적용
+                updateFontSize(currentFontSize);
                 
                 popupModal.style.width = '40vw';
                 popupModal.style.height = 'auto';
@@ -516,11 +665,12 @@
                 
                 requestAnimationFrame(() => {
                     const initialTextWidth = firstImpressionText.offsetWidth;
-                    firstImpressionText.style.minWidth = `${initialTextWidth}px`;
-                    currentImpressionText.style.minWidth = `${initialTextWidth}px`;
-
-                    resizeObserver.observe(firstImpressionText);
-                    resizeObserver.observe(currentImpressionText);
+                    if(initialTextWidth > 0) {
+                        firstImpressionText.style.minWidth = `${initialTextWidth}px`;
+                        currentImpressionText.style.minWidth = `${initialTextWidth}px`;
+                        resizeObserver.observe(firstImpressionText);
+                        resizeObserver.observe(currentImpressionText);
+                    }
                 });
             }
 
@@ -534,7 +684,11 @@
                     el.style.width = '';
                     el.style.minWidth = '';
                     el.style.fontSize = '';
+                    el.style.height = ''; // 높이 스타일 초기화 추가
                 });
+                
+                popupModal.style.width = ''; // 모달 가로 크기 초기화
+                popupModal.style.height = ''; // 모달 세로 크기 초기화
             }
 
             function openConfirmDialog() {
@@ -565,16 +719,13 @@
                     submitter: userDisplayName
                 };
 
-                if (!GAS_URL || GAS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-                    alert('Please set the Google Apps Script URL in the script first.');
+                if (!GAS_URL) {
+                    alert('Google Apps Script URL이 설정되지 않았습니다.');
                     closeConfirmDialog();
                     return;
                 }
 
-                // For 'dev' user, skip duplicate check and don't disable the button
-                if (userDisplayName.toLowerCase() === 'dev') {
-                     // Always allow submission for dev
-                } else {
+                if (userDisplayName.toLowerCase() !== 'dev') {
                     const submittedKey = `submitted_${userDisplayName}_${activeName}`;
                     try {
                         if (localStorage.getItem(submittedKey)) {
@@ -583,16 +734,20 @@
                             closeModal();
                             return;
                         }
-                    } catch (e) {
-                        console.error("Local storage is unavailable.", e);
-                    }
+                    } catch (e) { console.error("Local storage is unavailable.", e); }
                 }
+
+                // 로딩 시작: 버튼 비활성화 및 텍스트 변경
+                confirmFinalBtn.disabled = true;
+                confirmCancelBtn.disabled = true;
+                const originalBtnText = confirmFinalBtn.textContent;
+                confirmFinalBtn.textContent = '저장 중...';
 
                 fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(dataToSave)
                 })
                 .then(() => {
@@ -601,6 +756,7 @@
                         const submittedKey = `submitted_${userDisplayName}_${activeName}`;
                         try {
                             localStorage.setItem(submittedKey, 'true');
+                            updateSubmittedStatus(); // 제출 후 즉시 상태 업데이트
                         } catch(e) {
                              console.error("Local storage is unavailable.", e);
                         }
@@ -611,6 +767,10 @@
                     alert('오류가 발생했습니다: ' + error);
                 })
                 .finally(() => {
+                    // 로딩 종료: 버튼 활성화 및 텍스트 복원
+                    confirmFinalBtn.disabled = false;
+                    confirmCancelBtn.disabled = false;
+                    confirmFinalBtn.textContent = originalBtnText;
                     closeConfirmDialog();
                     closeModal();
                 });
@@ -630,4 +790,4 @@
         });
     </script>
 </body>
-</html>
+</htmhttps://script.google.com/macros/s/AKfycbw9LhRulSzsN_Yx7u-waO1p0qpi-3C_54PEorTR_7OUIPaw6p1Bmkx7PC1cQpzAPSC80Q/exec>
