@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanB NfromS</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --panel: #171a21;
+            --stroke: #2a2f3a;
+            --ink: #e7eaf0;
+            --muted-ink: #cdd5e3;
+            --accent: #2cc781;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--ink);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1550px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .line-group {
+            margin-bottom: 20px;
+        }
+        .line-group-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: flex-start;
+        }
+        .subgroup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .subgroup-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--muted-ink);
+            margin: 0;
+        }
+        .image-button {
+            width: 128px;
+            padding: 0;
+            border: 2px solid var(--stroke);
+            border-radius: 12px;
+            background-color: var(--panel);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: auto;
+            text-decoration: none;
+            color: inherit;
+        }
+        .image-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(156, 193, 255, 0.3);
+            border-color: #9cc1ff;
+        }
+        .image-wrapper {
+            width: 128px;
+            height: 128px;
+            overflow: hidden;
+        }
+        .image-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .line-separator {
+            border: none;
+            height: 2px;
+            background-color: var(--stroke);
+            margin: 40px 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-veil {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-veil.visible {
+            display: flex;
+        }
+        .popup-modal {
+            background-color: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease-out;
+            min-width: 400px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--stroke);
+        }
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .font-size-control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .font-size-label {
+            color: var(--muted-ink);
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .font-size-controller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--bg);
+            border: 1px solid var(--stroke);
+            border-radius: 8px;
+            padding: 2px 5px;
+            user-select: none;
+        }
+        .font-size-controller button {
+            background: none;
+            border: none;
+            color: var(--muted-ink);
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        .font-size-controller button:hover {
+            color: var(--ink);
+        }
+        #font-size-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            min-width: 2ch;
+            text-align: center;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--muted-ink);
+            font-size: 2em;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .modal-content {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .text-field-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .text-field-group label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--muted-ink);
+        }
+        .text-field-group textarea {
+            background-color: var(--bg);
+            border: 1px solid var(--stroke);
+            border-radius: 8px;
+            color: var(--ink);
+            padding: 10px;
+            min-height: 300px;
+            resize: both;
+            flex-grow: 1;
+        }
+        .modal-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid var(--stroke);
+        }
+        .modal-confirm-btn {
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-confirm-btn:hover {
+            background-color: #26a26a;
+        }
+        .text-field-group textarea::-webkit-resizer {
+            background-color: var(--ink);
+            border-left: 2px solid var(--ink);
+            border-top: 2px solid var(--ink);
+        }
+        #confirm-dialog {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            animation: fadeIn 0.2s ease-out;
+        }
+        #confirm-dialog .confirm-dialog-box {
+            background-color: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+        #confirm-dialog p {
+            margin: 0;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        .confirm-dialog-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirm-dialog-buttons button {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid var(--stroke);
+        }
+        #confirm-cancel-btn {
+            background-color: darkred;
+            color: var(--muted-ink);
+        }
+        #confirm-final-btn {
+            background-color: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <h1>첫인상 현인상</h1>
+        <!-- Content will be dynamically generated here -->
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal-veil" class="modal-veil">
+        <div class="popup-modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title-span"></span>
+                <div class="font-size-control-group">
+                    <span class="font-size-label">폰트사이즈 :</span>
+                    <div class="font-size-controller">
+                        <button id="font-minus-btn">-</button>
+                        <span id="font-size-display">15</span>
+                        <button id="font-plus-btn">+</button>
+                    </div>
+                </div>
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="text-field-group">
+                    <label for="impression-first">첫인상</label>
+                    <textarea id="impression-first"></textarea>
+                </div>
+                <div class="text-field-group">
+                    <label for="impression-current">현인상</label>
+                    <textarea id="impression-current"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-confirm-btn" class="modal-confirm-btn">확정</button>
+            </div>
+        </div>
+
+        <!-- Confirmation Dialog -->
+        <div id="confirm-dialog">
+            <div class="confirm-dialog-box">
+                <p>확정 시 내용을 수정 할 수 없습니다.<br>등록하시겠습니까?</p>
+                <div class="confirm-dialog-buttons">
+                    <button id="confirm-final-btn">확정</button>
+                    <button id="confirm-cancel-btn">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbxaDPvLCYR3DY4OxXD7ce2pgcu2z6jkLnz7zJQNPiSJ-SnCo-Bi8lWb8PfLjvufr2uFFA/exec';
+
+            const lineData = [
+                { title: "Line 1", subgroups: ["빕어"] },
+                { title: "Line 2", subgroups: ["한세긴", "송밤", "나비"] },
+                { title: "Line 3", subgroups: ["다니얀", "밤베", "밤새나", "요코링","윰로로","찌로","크앙희","프하","호발"] },
+                { title: "Line 4", subgroups: ["공도리","도라희","소호","한세현"] },  
+                //{ title: "Line 5", subgroups: ["대표님","청아"] }
+            ];
+
+            const mainContainer = document.getElementById('main-container');
+
+            function createSubgroupHTML(name) {
+                const placeholderUrl = `https://via.placeholder.com/128/1a1d24/e7eaf0?text=${name}`;
+                return `
+                    <div class="subgroup">
+                        <h3 class="subgroup-title">${name}</h3>
+                        <button class="image-button" data-name="${name}">
+                            <div class="image-wrapper">
+                                <img src="./assets/${name}.png" alt="${name}.png" onerror="this.onerror=null;this.src='${placeholderUrl}';">
+                            </div>
+                        </button>
+                    </div>
+                `;
+            }
+
+            function createLineGroupHTML(lineGroup) {
+                const subgroupsHTML = lineGroup.subgroups.map(createSubgroupHTML).join('');
+                return `<div class="line-group"><div class="line-group-content">${subgroupsHTML}</div></div>`;
+            }
+
+            if (mainContainer) {
+                const allLinesHTML = lineData.map(createLineGroupHTML).join('<hr class="line-separator">');
+                mainContainer.innerHTML += allLinesHTML;
+            }
+
+            const modalVeil = document.getElementById('modal-veil');
+            const popupModal = document.querySelector('.popup-modal');
+            const modalContent = document.querySelector('.modal-content');
+            const modalTitleSpan = document.getElementById('modal-title-span');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+            const firstImpressionText = document.getElementById('impression-first');
+            const currentImpressionText = document.getElementById('impression-current');
+            
+            const fontMinusBtn = document.getElementById('font-minus-btn');
+            const fontPlusBtn = document.getElementById('font-plus-btn');
+            const fontSizeDisplay = document.getElementById('font-size-display');
+            let currentFontSize = 15;
+            let activeName = '';
+
+            const confirmDialog = document.getElementById('confirm-dialog');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const confirmFinalBtn = document.getElementById('confirm-final-btn');
+
+            function updateFontSize(newSize) {
+                if (newSize < 15) newSize = 15;
+                currentFontSize = newSize;
+                fontSizeDisplay.textContent = currentFontSize;
+                firstImpressionText.style.fontSize = `${currentFontSize}px`;
+                currentImpressionText.style.fontSize = `${currentFontSize}px`;
+            }
+
+            fontPlusBtn.addEventListener('click', () => updateFontSize(currentFontSize + 2));
+            fontMinusBtn.addEventListener('click', () => updateFontSize(currentFontSize - 2));
+
+            const syncModalSize = () => {
+                const contentStyles = window.getComputedStyle(modalContent);
+                const contentGap = parseFloat(contentStyles.gap);
+                const contentPadding = parseFloat(contentStyles.paddingLeft) + parseFloat(contentStyles.paddingRight);
+                const newModalWidth = firstImpressionText.offsetWidth + currentImpressionText.offsetWidth + contentGap + contentPadding;
+                if (Math.abs(popupModal.offsetWidth - newModalWidth) > 1) {
+                   popupModal.style.width = `${newModalWidth}px`;
+                }
+            };
+
+            const resizeObserver = new ResizeObserver(syncModalSize);
+
+            function openModal(name) {
+                activeName = name;
+                modalTitleSpan.textContent = name;
+                firstImpressionText.value = '';
+                currentImpressionText.value = '';
+                updateFontSize(15);
+                
+                popupModal.style.width = '40vw';
+                popupModal.style.height = 'auto';
+
+                modalVeil.classList.add('visible');
+                
+                requestAnimationFrame(() => {
+                    const initialTextWidth = firstImpressionText.offsetWidth;
+                    firstImpressionText.style.minWidth = `${initialTextWidth}px`;
+                    currentImpressionText.style.minWidth = `${initialTextWidth}px`;
+
+                    resizeObserver.observe(firstImpressionText);
+                    resizeObserver.observe(currentImpressionText);
+                });
+            }
+
+            function closeModal() {
+                modalVeil.classList.remove('visible');
+                resizeObserver.unobserve(firstImpressionText);
+                resizeObserver.unobserve(currentImpressionText);
+
+                const elementsToClean = [popupModal, firstImpressionText, currentImpressionText];
+                elementsToClean.forEach(el => {
+                    el.style.width = '';
+                    el.style.minWidth = '';
+                    el.style.fontSize = '';
+                });
+            }
+
+            function openConfirmDialog() {
+                confirmDialog.style.display = 'flex';
+            }
+
+            function closeConfirmDialog() {
+                confirmDialog.style.display = 'none';
+            }
+
+            if (mainContainer) {
+                mainContainer.addEventListener('click', (event) => {
+                    const button = event.target.closest('.image-button');
+                    if (button) {
+                        openModal(button.dataset.name);
+                    }
+                });
+            }
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalConfirmBtn.addEventListener('click', openConfirmDialog);
+
+            confirmFinalBtn.addEventListener('click', () => {
+                const dataToSave = {
+                    name: activeName,
+                    first: firstImpressionText.value,
+                    current: currentImpressionText.value
+                };
+
+                if (!GAS_URL || GAS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                    alert('Please set the Google Apps Script URL in the script first.');
+                    closeConfirmDialog();
+                    return;
+                }
+
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                })
+                .then(() => alert('저장되었습니다!'))
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다: ' + error);
+                })
+                .finally(() => {
+                    closeConfirmDialog();
+                    closeModal();
+                });
+            });
+
+            confirmCancelBtn.addEventListener('click', closeConfirmDialog);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modalVeil.classList.contains('visible')) {
+                    if (confirmDialog.style.display === 'flex') {
+                        closeConfirmDialog();
+                    } else {
+                        closeModal();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
