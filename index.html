@@ -376,9 +376,133 @@
         .name-entry-modal button:hover {
             background-color: #26a26a;
         }
+        .error-message {
+            color: #ff5c5c;
+            font-size: 0.9em;
+            height: 1.2em; /* 메시지 유무에 따른 레이아웃 변경 방지 */
+            margin-top: -10px;
+            margin-bottom: 10px;
+            visibility: hidden; /* 평소에는 숨김 */
+        }
+        .error-message.visible {
+            visibility: visible;
+        }
+        #name-input.invalid {
+            animation: shake 0.5s;
+            border-color: #ff5c5c;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
         #confirm-final-btn:disabled {
             background-color: #555;
             cursor: wait;
+        }
+
+        /* Summary Modal Styles */
+        .summary-modal {
+            background-color: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            width: 80vw;
+            max-width: 1200px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .summary-modal-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--stroke);
+            text-align: center;
+            position: relative;
+        }
+        .summary-modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .summary-modal-close-btn {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted-ink);
+            font-size: 2.5em;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .summary-modal-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        .summary-characters-list {
+            width: 200px;
+            border-right: 1px solid var(--stroke);
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .summary-char-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background-color: var(--bg);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            color: var(--ink);
+        }
+        .summary-char-button:hover {
+            background-color: var(--stroke);
+        }
+        .summary-char-button.active {
+            border-color: var(--accent);
+            background-color: #2a2f3a80;
+        }
+        .summary-char-button img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .summary-details {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .summary-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary-details th, .summary-details td {
+            border: 1px solid var(--stroke);
+            padding: 12px;
+            text-align: left;
+            width: 50%; /* 5:5 비율로 너비 설정 */
+        }
+        .summary-details th {
+            background-color: #2a2f3a80;
+        }
+        .summary-details td.col-char {
+            width: 150px;
+            text-align: center;
+        }
+        .summary-details td.col-char img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -398,11 +522,12 @@
             <h2>이름을 입력해주세요</h2>
             <p class="streamer-guidance">스트리머는 본인 숲 아이디를 입력하세요</p>
             <input type="text" id="name-input" placeholder="이름">
+            <p id="name-error-message" class="error-message"></p>
             <button id="name-confirm-btn">확인</button>
         </div>
     </div>
 
-    <!-- Modal Structure -->
+    <!-- Impression Modal Structure -->
     <div id="modal-veil" class="modal-veil">
         <div class="popup-modal">
             <button id="modal-close-btn" class="modal-close-btn">&times;</button>
@@ -445,6 +570,34 @@
         </div>
     </div>
 
+    <!-- Summary Modal Structure -->
+    <div id="summary-modal-veil" class="modal-veil">
+        <div class="summary-modal">
+            <div class="summary-modal-header">
+                <span class="summary-modal-title">나의 기록</span>
+                <button id="summary-modal-close-btn" class="summary-modal-close-btn">&times;</button>
+            </div>
+            <div class="summary-modal-content">
+                <div class="summary-characters-list">
+                    <!-- Character buttons will be dynamically inserted here -->
+                </div>
+                <div class="summary-details">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>첫인상</th>
+                                <th>현인상</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Submission data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9LhRulSzsN_Yx7u-waO1p0qpi-3C_54PEorTR_7OUIPaw6p1Bmkx7PC1cQpzAPSC80Q/exec';
@@ -546,12 +699,30 @@
                 }
             }
 
+            const nameErrorMessage = document.getElementById('name-error-message');
+
             nameConfirmBtn.addEventListener('click', () => {
                 const enteredName = nameInput.value.trim();
                 if (enteredName) {
                     initializeUser(enteredName);
                 } else {
-                    alert('이름을 입력해주세요.');
+                    // alert 대신 쉐이크 애니메이션과 에러 메시지 표시
+                    nameErrorMessage.textContent = '이름을 입력해야합니다!';
+                    nameErrorMessage.classList.add('visible');
+                    nameInput.classList.add('invalid');
+                    nameInput.focus();
+
+                    // 애니메이션이 끝나면 클래스 제거
+                    setTimeout(() => {
+                        nameInput.classList.remove('invalid');
+                    }, 500);
+                }
+            });
+
+            nameInput.addEventListener('input', () => {
+                // 사용자가 입력을 시작하면 에러 메시지 숨김
+                if (nameErrorMessage.classList.contains('visible')) {
+                    nameErrorMessage.classList.remove('visible');
                 }
             });
 
@@ -779,14 +950,146 @@
             confirmCancelBtn.addEventListener('click', closeConfirmDialog);
 
             document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modalVeil.classList.contains('visible')) {
-                    if (confirmDialog.style.display === 'flex') {
-                        closeConfirmDialog();
-                    } else {
-                        closeModal();
+                // ESC 키 처리
+                if (event.key === 'Escape') {
+                    if (summaryModalVeil.classList.contains('visible')) {
+                        closeSummaryModal();
+                    } else if (modalVeil.classList.contains('visible')) {
+                        if (confirmDialog.style.display === 'flex') {
+                            closeConfirmDialog();
+                        } else {
+                            closeModal();
+                        }
                     }
                 }
+
+                // F12 키 금지
+                if (event.key === 'F12') {
+                    event.preventDefault();
+                }
             });
+
+            // 마우스 우클릭 금지
+            document.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+            });
+
+
+            // --- Summary Modal Logic ---
+            const summaryModalVeil = document.getElementById('summary-modal-veil');
+            const summaryModalCloseBtn = document.getElementById('summary-modal-close-btn');
+            const welcomeContainer = document.querySelector('.title-container');
+            const summaryCharList = document.querySelector('.summary-characters-list');
+            const summaryDetailsTbody = document.querySelector('.summary-details tbody');
+
+            function renderSummaryModal(submissions) {
+                summaryCharList.innerHTML = '';
+                summaryDetailsTbody.innerHTML = '';
+
+                if (submissions.length === 0) {
+                    summaryDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">아직 작성한 기록이 없습니다.</td></tr>';
+                    return;
+                }
+                
+                // 캐릭터 목록 생성 (중복 제거)
+                const characters = [...new Set(submissions.map(s => s.character))];
+                
+                characters.forEach(charName => {
+                    const charButton = document.createElement('button');
+                    charButton.className = 'summary-char-button';
+                    charButton.innerHTML = `<img src="./assets/${charName}.png" alt="${charName}"><span>${charName}</span>`;
+                    charButton.onclick = () => filterSummaryTable(submissions, charName);
+                    summaryCharList.appendChild(charButton);
+                });
+                
+                // 첫 번째 캐릭터의 데이터로 테이블 기본 채우기
+                if (characters.length > 0) {
+                    filterSummaryTable(submissions, characters[0]);
+                }
+            }
+
+            function filterSummaryTable(submissions, characterName = null) {
+                // 버튼 활성 상태 업데이트
+                document.querySelectorAll('.summary-char-button').forEach(btn => {
+                    const btnText = btn.querySelector('span').textContent;
+                    if ((!characterName && btnText === '전체보기') || (btnText === characterName)) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                summaryDetailsTbody.innerHTML = '';
+                const filteredSubmissions = characterName ? submissions.filter(s => s.character === characterName) : submissions;
+
+                if (filteredSubmissions.length === 0) {
+                    summaryDetailsTbody.innerHTML = '<tr><td colspan="2" style="text-align: center;">기록이 없습니다.</td></tr>';
+                    return;
+                }
+
+                filteredSubmissions.forEach(sub => {
+                    const firstImpression = String(sub.first || '').replace(/\n/g, '<br>');
+                    const currentImpression = String(sub.current || '').replace(/\n/g, '<br>');
+                    const row = `
+                        <tr>
+                            <td>${firstImpression}</td>
+                            <td>${currentImpression}</td>
+                        </tr>
+                    `;
+                    summaryDetailsTbody.innerHTML += row;
+                });
+            }
+
+            let isFetchingSummary = false; // 요약 데이터 요청 상태 플래그
+
+            function fetchSummaryData() {
+                if (!userDisplayName || isFetchingSummary) return; // 이미 요청 중이면 중복 실행 방지
+
+                isFetchingSummary = true; // 요청 시작
+                summaryCharList.innerHTML = '<p>로딩 중...</p>';
+                summaryDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">로딩 중...</td></tr>';
+                
+                const callbackName = 'handleSummaryData';
+                window[callbackName] = function(result) {
+                    try {
+                        if (result.status === 'success') {
+                            renderSummaryModal(result.data);
+                        } else {
+                            throw new Error(result.message || 'Failed to fetch data.');
+                        }
+                    } finally {
+                        // Clean up and reset flag
+                        isFetchingSummary = false;
+                        document.body.removeChild(script);
+                        delete window[callbackName];
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.src = `${GAS_URL}?user=${encodeURIComponent(userDisplayName)}&callback=${callbackName}`;
+                
+                script.onerror = () => {
+                    summaryDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다. 스크립트 로드에 실패했습니다.</td></tr>`;
+                    // Clean up and reset flag on error
+                    isFetchingSummary = false;
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                };
+                
+                document.body.appendChild(script);
+            }
+
+            function openSummaryModal() {
+                summaryModalVeil.classList.add('visible');
+                fetchSummaryData();
+            }
+
+            function closeSummaryModal() {
+                summaryModalVeil.classList.remove('visible');
+            }
+
+            welcomeContainer.addEventListener('click', openSummaryModal);
+            summaryModalCloseBtn.addEventListener('click', closeSummaryModal);
         });
     </script>
 </body>
