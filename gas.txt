@@ -1,0 +1,62 @@
+// This function runs when your website sends a POST request.
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var sheetName = data.name;
+    var firstImpression = data.first;
+    var currentImpression = data.current;
+
+    if (!sheetName) {
+      throw new Error("Sheet name ('name' property) is missing from the request.");
+    }
+
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+    if (!sheet) {
+      throw new Error("Sheet with name '" + sheetName + "' not found.");
+    }
+
+    // --- New Logic for Random Non-repeating ID ---
+    var anonymousId;
+    var allIdsRange = sheet.getRange("A2:A"); // Get all of column A from row 2 down
+    var existingIds = allIdsRange.getValues()
+                                 .flat() // Flatten 2D array to 1D
+                                 .filter(String) // Remove empty cells
+                                 .map(id => parseInt(id.replace('익명', ''), 10)) // Extract numbers
+                                 .filter(num => !isNaN(num)); // Filter out any non-number results
+
+    var availableNumbers = [];
+    for (var i = 1; i <= 100; i++) {
+      if (!existingIds.includes(i)) {
+        availableNumbers.push(i);
+      }
+    }
+
+    if (availableNumbers.length === 0) {
+      // Fallback if all 1-100 numbers are taken, using a simple sequential number.
+      var nextSequentialId = sheet.getLastRow(); 
+      anonymousId = "익명" + nextSequentialId;
+    } else {
+      var randomIndex = Math.floor(Math.random() * availableNumbers.length);
+      var randomNumber = availableNumbers[randomIndex];
+      anonymousId = "익명" + randomNumber;
+    }
+    // --- End of New Logic ---
+
+    var nextRow = sheet.getLastRow() + 1;
+    var newRowData = [anonymousId, firstImpression, currentImpression];
+    sheet.getRange(nextRow, 1, 1, newRowData.length).setValues([newRowData]);
+
+    return ContentService.createContent(JSON.stringify({
+      'status': 'success',
+      'message': 'Data saved to sheet ' + sheetName
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    // Return an error response if something goes wrong
+    return ContentService.createContent(JSON.stringify({
+      'status': 'error',
+      'message': error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}

@@ -268,12 +268,61 @@
             color: var(--bg);
             border-color: var(--accent);
         }
+        .name-entry-modal {
+            background-color: var(--panel);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--stroke);
+        }
+        .name-entry-modal h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--ink);
+        }
+        .name-entry-modal input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--stroke);
+            background-color: var(--bg);
+            color: var(--ink);
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+        .name-entry-modal button {
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        .name-entry-modal button:hover {
+            background-color: #26a26a;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="main-container">
         <h1>첫인상 현인상</h1>
         <!-- Content will be dynamically generated here -->
+    </div>
+
+    <!-- Name Entry Modal -->
+    <div id="name-entry-veil" class="modal-veil visible">
+        <div class="name-entry-modal">
+            <h2>이름을 입력해주세요</h2>
+            <input type="text" id="name-input" placeholder="이름">
+            <button id="name-confirm-btn">확인</button>
+        </div>
     </div>
 
     <!-- Modal Structure -->
@@ -321,16 +370,71 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const GAS_URL = 'https://script.google.com/macros/s/AKfycbxaDPvLCYR3DY4OxXD7ce2pgcu2z6jkLnz7zJQNPiSJ-SnCo-Bi8lWb8PfLjvufr2uFFA/exec';
+            let userDisplayName = '';
+
+            const nameMappings = [
+                { sname: "", key: "" },
+            ];
 
             const lineData = [
                 { title: "Line 1", subgroups: ["빕어"] },
                 { title: "Line 2", subgroups: ["한세긴", "송밤", "나비"] },
                 { title: "Line 3", subgroups: ["다니얀", "밤베", "밤새나", "요코링","윰로로","찌로","크앙희","프하","호발"] },
                 { title: "Line 4", subgroups: ["공도리","도라희","소호","한세현"] },  
-                //{ title: "Line 5", subgroups: ["대표님","청아"] }
             ];
 
             const mainContainer = document.getElementById('main-container');
+            const nameEntryVeil = document.getElementById('name-entry-veil');
+            const nameInput = document.getElementById('name-input');
+            const nameConfirmBtn = document.getElementById('name-confirm-btn');
+
+            function initializeUser(name) {
+                userDisplayName = name;
+                const mapping = nameMappings.find(m => m.key.toLowerCase() === name.toLowerCase());
+                if (mapping && mapping.sname) {
+                    userDisplayName = mapping.sname;
+                }
+
+                if (name.toLowerCase() !== 'dev') {
+                    try {
+                        localStorage.setItem('userName', name);
+                    } catch (e) {
+                        console.error("Local storage is unavailable.", e);
+                    }
+                }
+                nameEntryVeil.classList.remove('visible');
+            }
+
+            function checkUser() {
+                try {
+                    const savedName = localStorage.getItem('userName');
+                    if (savedName) {
+                        initializeUser(savedName);
+                    } else {
+                        nameEntryVeil.classList.add('visible');
+                    }
+                } catch (e) {
+                    console.error("Local storage is unavailable, proceeding without it.", e);
+                    nameEntryVeil.classList.add('visible');
+                }
+            }
+
+            nameConfirmBtn.addEventListener('click', () => {
+                const enteredName = nameInput.value.trim();
+                if (enteredName) {
+                    initializeUser(enteredName);
+                } else {
+                    alert('이름을 입력해주세요.');
+                }
+            });
+
+            nameInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    nameConfirmBtn.click();
+                }
+            });
+            
+            checkUser();
 
             function createSubgroupHTML(name) {
                 const placeholderUrl = `https://via.placeholder.com/128/1a1d24/e7eaf0?text=${name}`;
@@ -457,13 +561,31 @@
                 const dataToSave = {
                     name: activeName,
                     first: firstImpressionText.value,
-                    current: currentImpressionText.value
+                    current: currentImpressionText.value,
+                    submitter: userDisplayName
                 };
 
                 if (!GAS_URL || GAS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
                     alert('Please set the Google Apps Script URL in the script first.');
                     closeConfirmDialog();
                     return;
+                }
+
+                // For 'dev' user, skip duplicate check and don't disable the button
+                if (userDisplayName.toLowerCase() === 'dev') {
+                     // Always allow submission for dev
+                } else {
+                    const submittedKey = `submitted_${userDisplayName}_${activeName}`;
+                    try {
+                        if (localStorage.getItem(submittedKey)) {
+                            alert('이미 제출했습니다.');
+                            closeConfirmDialog();
+                            closeModal();
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Local storage is unavailable.", e);
+                    }
                 }
 
                 fetch(GAS_URL, {
@@ -473,7 +595,17 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dataToSave)
                 })
-                .then(() => alert('저장되었습니다!'))
+                .then(() => {
+                    alert('저장되었습니다!');
+                    if (userDisplayName.toLowerCase() !== 'dev') {
+                        const submittedKey = `submitted_${userDisplayName}_${activeName}`;
+                        try {
+                            localStorage.setItem(submittedKey, 'true');
+                        } catch(e) {
+                             console.error("Local storage is unavailable.", e);
+                        }
+                    }
+                })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('오류가 발생했습니다: ' + error);
