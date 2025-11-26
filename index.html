@@ -708,7 +708,7 @@
 
             nameConfirmBtn.addEventListener('click', () => {
                 const enteredName = nameInput.value.trim();
-                const isSnameDuplicate = nameMappings.some(m => m.sname.toLowerCase() === enteredName.toLowerCase() && m.sname !== "");
+                const isSnameDuplicate = nameMappings.some(m => m.sname && enteredName.toLowerCase().includes(m.sname.toLowerCase()) && m.sname !== "");
 
                 if (!enteredName) {
                     nameErrorMessage.textContent = '이름을 입력해야합니다!';
