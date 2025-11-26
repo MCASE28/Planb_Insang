@@ -259,6 +259,11 @@
         .modal-confirm-btn:hover {
             background-color: #26a26a;
         }
+        #modal-confirm-btn:disabled {
+            background-color: var(--stroke); /* 배경색을 회색 계열로 */
+            color: var(--muted-ink); /* 글자색도 흐리게 */
+            cursor: not-allowed; /* 커서 변경 */
+        }
         .text-field-group textarea::-webkit-resizer {
             background-color: var(--ink);
             border-left: 2px solid var(--ink);
@@ -554,7 +559,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="modal-confirm-btn" class="modal-confirm-btn">확정</button>
+                <button id="modal-confirm-btn" class="modal-confirm-btn" disabled>확정</button>
             </div>
         </div>
 
@@ -800,6 +805,18 @@
 
             const resizeObserver = new ResizeObserver(syncModalSize);
 
+            // 확정 버튼 활성화/비활성화 상태를 확인하는 함수
+            function checkConfirmButtonState() {
+                const firstLength = firstImpressionText.value.trim().length;
+                const currentLength = currentImpressionText.value.trim().length;
+                
+                if (firstLength > 0 && currentLength > 0) {
+                    modalConfirmBtn.disabled = false;
+                } else {
+                    modalConfirmBtn.disabled = true;
+                }
+            }
+            
             const modalCharacterImage = document.getElementById('modal-character-image');
 
             function openModal(name) {
@@ -833,6 +850,7 @@
                 popupModal.style.height = 'auto';
 
                 modalVeil.classList.add('visible');
+                checkConfirmButtonState(); // 모달이 열릴 때 버튼 상태 초기화
                 
                 requestAnimationFrame(() => {
                     const initialTextWidth = firstImpressionText.offsetWidth;
@@ -844,6 +862,10 @@
                     }
                 });
             }
+
+            // 텍스트 필드 내용이 변경될 때마다 버튼 상태 업데이트
+            firstImpressionText.addEventListener('input', checkConfirmButtonState);
+            currentImpressionText.addEventListener('input', checkConfirmButtonState);
 
             function closeModal() {
                 modalVeil.classList.remove('visible');
