@@ -708,16 +708,24 @@
 
             nameConfirmBtn.addEventListener('click', () => {
                 const enteredName = nameInput.value.trim();
-                if (enteredName) {
-                    initializeUser(enteredName);
-                } else {
-                    // alert 대신 쉐이크 애니메이션과 에러 메시지 표시
+                const isSnameDuplicate = nameMappings.some(m => m.sname.toLowerCase() === enteredName.toLowerCase() && m.sname !== "");
+
+                if (!enteredName) {
                     nameErrorMessage.textContent = '이름을 입력해야합니다!';
                     nameErrorMessage.classList.add('visible');
                     nameInput.classList.add('invalid');
                     nameInput.focus();
+                } else if (isSnameDuplicate) {
+                    nameErrorMessage.textContent = '사용할 수 없는 이름입니다!';
+                    nameErrorMessage.classList.add('visible');
+                    nameInput.classList.add('invalid');
+                    nameInput.focus();
+                } else {
+                    initializeUser(enteredName);
+                }
 
-                    // 애니메이션이 끝나면 클래스 제거
+                // 애니메이션이 끝나면 클래스 제거 (에러 상황 공통 처리)
+                if (!enteredName || isSnameDuplicate) {
                     setTimeout(() => {
                         nameInput.classList.remove('invalid');
                     }, 500);
