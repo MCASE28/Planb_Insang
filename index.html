@@ -361,8 +361,6 @@
             transition: background-color 0.2s;
         }
         .image-button.submitted {
-            cursor: not-allowed;
-            pointer-events: none;
             position: relative;
         }
         .image-button.submitted .image-wrapper {
@@ -454,6 +452,7 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            flex-shrink: 0;
         }
         .summary-char-button {
             display: flex;
@@ -485,16 +484,22 @@
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
+            width: calc(100% - 220px);
         }
         .summary-details table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
+
+        .my-records-details th, .my-records-details td {
+            width: 50%;
+        }
+
         .summary-details th, .summary-details td {
             border: 1px solid var(--stroke);
             padding: 12px;
             text-align: left;
-            width: 50%; /* 5:5 비율로 너비 설정 */
         }
         .summary-details th {
             background-color: #2a2f3a80;
@@ -587,15 +592,46 @@
                     <!-- Character buttons will be dynamically inserted here -->
                 </div>
                 <div class="summary-details">
-                    <table>
+                    <table class="my-records-details">
                         <thead>
                             <tr>
-                                <th>첫인상</th>
-                                <th>현인상</th>
+                                <th style="text-align: center;">첫인상</th>
+                                <th style="text-align: center;">현인상</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Submission data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impression Details Modal -->
+    <div id="impression-details-modal-veil" class="modal-veil">
+        <div class="summary-modal">
+            <div class="summary-modal-header">
+                <span id="impression-details-title" class="summary-modal-title"></span>
+                <button id="impression-details-close-btn" class="summary-modal-close-btn">&times;</button>
+            </div>
+            <div class="summary-modal-content">
+                <div class="summary-details">
+                    <table>
+                    <colgroup>
+                        <col style="width: 10%;">
+                        <col style="width: 45%;">
+                        <col style="width: 45%;">
+                    </colgroup>
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">익명</th>
+                                <th style="text-align: center;">첫인상</th>
+                                <th style="text-align: center;">현인상</th>
+                            </tr>
+                        </thead>
+                        <tbody id="impression-details-tbody">
+                            <!-- Impression data will be dynamically inserted here -->
                         </tbody>
                     </table>
                 </div>
@@ -639,6 +675,22 @@
             const nameEntryVeil = document.getElementById('name-entry-veil');
             const nameInput = document.getElementById('name-input');
             const nameConfirmBtn = document.getElementById('name-confirm-btn');
+
+            function attachButtonListeners() {
+                document.querySelectorAll('.image-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const characterName = button.dataset.name;
+                        console.log('Button clicked for character:', characterName);
+                        if (button.classList.contains('submitted')) {
+                            console.log('Button has "submitted" class. Opening details modal.');
+                            openImpressionDetailsModal(characterName);
+                        } else {
+                            console.log('Button does not have "submitted" class. Opening submission modal.');
+                            openModal(characterName);
+                        }
+                    });
+                });
+            }
 
             // 제출 완료 상태를 UI에 업데이트하는 함수
             function updateSubmittedStatus() {
@@ -688,6 +740,7 @@
                 }
                 nameEntryVeil.classList.remove('visible');
                 updateSubmittedStatus(); // 유저 초기화 후 제출 상태 업데이트
+                attachButtonListeners(); // Attach listeners after user is initialized
             }
 
             function checkUser() {
@@ -900,15 +953,6 @@
                 confirmDialog.style.display = 'none';
             }
 
-            if (mainContainer) {
-                mainContainer.addEventListener('click', (event) => {
-                    const button = event.target.closest('.image-button');
-                    if (button) {
-                        openModal(button.dataset.name);
-                    }
-                });
-            }
-
             modalCloseBtn.addEventListener('click', closeModal);
             modalConfirmBtn.addEventListener('click', openConfirmDialog);
 
@@ -984,6 +1028,8 @@
                 if (event.key === 'Escape') {
                     if (summaryModalVeil.classList.contains('visible')) {
                         closeSummaryModal();
+                    } else if (impressionDetailsModalVeil.classList.contains('visible')) {
+                        closeImpressionDetailsModal();
                     } else if (modalVeil.classList.contains('visible')) {
                         if (confirmDialog.style.display === 'flex') {
                             closeConfirmDialog();
@@ -1017,7 +1063,7 @@
                 summaryDetailsTbody.innerHTML = '';
 
                 if (submissions.length === 0) {
-                    summaryDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">아직 작성한 기록이 없습니다.</td></tr>';
+                    summaryDetailsTbody.innerHTML = '<tr><td colspan="2" style="text-align: center;">아직 작성한 기록이 없습니다.</td></tr>';
                     return;
                 }
                 
@@ -1120,6 +1166,79 @@
 
             welcomeContainer.addEventListener('click', openSummaryModal);
             summaryModalCloseBtn.addEventListener('click', closeSummaryModal);
+
+            // --- Impression Details Modal Logic ---
+            const impressionDetailsModalVeil = document.getElementById('impression-details-modal-veil');
+            const impressionDetailsCloseBtn = document.getElementById('impression-details-close-btn');
+            const impressionDetailsTitle = document.getElementById('impression-details-title');
+            const impressionDetailsTbody = document.getElementById('impression-details-tbody');
+
+            function openImpressionDetailsModal(characterName) {
+                impressionDetailsTitle.textContent = `${characterName}의 첫인상 / 현인상`;
+                fetchImpressionData(characterName);
+                impressionDetailsModalVeil.classList.add('visible');
+            }
+
+            function closeImpressionDetailsModal() {
+                impressionDetailsModalVeil.classList.remove('visible');
+            }
+
+            impressionDetailsCloseBtn.addEventListener('click', closeImpressionDetailsModal);
+
+            let isFetchingImpressions = false;
+            function fetchImpressionData(characterName) {
+                if (isFetchingImpressions) return;
+                isFetchingImpressions = true;
+                impressionDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">로딩 중...</td></tr>';
+
+                const callbackName = 'handleImpressionData';
+                window[callbackName] = function(result) {
+                    try {
+                        if (result.status === 'success') {
+                            renderImpressionDetails(result.data);
+                        } else {
+                            throw new Error(result.message || 'Failed to fetch data.');
+                        }
+                    } finally {
+                        isFetchingImpressions = false;
+                        document.body.removeChild(script);
+                        delete window[callbackName];
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.src = `${GAS_URL}?action=getImpressions&character=${encodeURIComponent(characterName)}&callback=${callbackName}`;
+                
+                script.onerror = () => {
+                    impressionDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+                    isFetchingImpressions = false;
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                };
+                
+                document.body.appendChild(script);
+            }
+
+            function renderImpressionDetails(data) {
+                impressionDetailsTbody.innerHTML = '';
+                if (data.length === 0) {
+                    impressionDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">기록이 없습니다.</td></tr>';
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    const firstImpression = String(item.first || '').replace(/\n/g, '<br>');
+                    const currentImpression = String(item.current || '').replace(/\n/g, '<br>');
+                    const row = `
+                        <tr>
+                            <td style="text-align: center;">익명${index + 1}</td>
+                            <td>${firstImpression}</td>
+                            <td>${currentImpression}</td>
+                        </tr>
+                    `;
+                    impressionDetailsTbody.innerHTML += row;
+                });
+            }
         });
     </script>
 </body>
