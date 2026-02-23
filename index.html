@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan.B 첫인상, 현인상</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
             --bg: #0f1115;
@@ -13,6 +16,7 @@
             --muted-ink: #cdd5e3;
             --accent: #2cc781;
         }
+
         body {
             background-color: var(--bg);
             color: var(--ink);
@@ -20,24 +24,29 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 1550px;
             margin: 0 auto;
         }
+
         h1 {
             text-align: center;
             margin-bottom: 40px;
         }
+
         .title-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-bottom: 20px;
         }
+
         .title-image {
             max-width: 350px;
             width: 100%;
         }
+
         #welcome-message {
             font-size: 2em;
             color: var(--ink);
@@ -45,21 +54,25 @@
             margin-top: 10px;
             text-align: center;
         }
+
         .welcome-subtext {
             font-size: 0.9em;
             color: var(--muted-ink);
             text-align: center;
             margin-top: 4px;
         }
+
         .line-group {
             margin-bottom: 20px;
         }
+
         .line-group-content {
             display: flex;
             flex-wrap: wrap;
             gap: 30px;
             justify-content: flex-start;
         }
+
         .subgroup {
             display: flex;
             flex-direction: column;
@@ -67,12 +80,14 @@
             gap: 10px;
             animation: fadeIn 0.5s ease-in-out;
         }
+
         .subgroup-title {
             font-size: 1.2em;
             font-weight: bold;
             color: var(--muted-ink);
             margin: 0;
         }
+
         .image-button {
             width: 128px;
             padding: 0;
@@ -89,31 +104,56 @@
             text-decoration: none;
             color: inherit;
         }
+
         .image-button:hover {
             transform: scale(1.08);
             box-shadow: 0 0 15px rgba(156, 193, 255, 0.3);
             border-color: #9cc1ff;
         }
+
         .image-wrapper {
             width: 128px;
             height: 128px;
             overflow: hidden;
         }
+
         .image-button img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
+        .line-title {
+            color: var(--muted-ink);
+            font-size: 30px;
+            /* 기존 14px의 5배 */
+            font-weight: 800;
+            margin: 60px 0 30px 10px;
+            padding-left: 20px;
+            border-left: 10px solid var(--muted-ink);
+            text-align: left;
+            letter-spacing: 0px;
+        }
+
         .line-separator {
             border: none;
             height: 2px;
             background-color: var(--stroke);
             margin: 40px 0;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .modal-veil {
             display: none;
             position: fixed;
@@ -124,9 +164,11 @@
             align-items: center;
             justify-content: center;
         }
+
         .modal-veil.visible {
             display: flex;
         }
+
         .popup-modal {
             background-color: var(--panel);
             border: 1px solid var(--stroke);
@@ -135,9 +177,11 @@
             flex-direction: column;
             animation: fadeIn 0.3s ease-out;
             min-width: 400px;
-            position: relative; /* 닫기 버튼을 위한 position-context */
+            position: relative;
+            /* 닫기 버튼을 위한 position-context */
             padding: 20px;
         }
+
         .modal-close-btn {
             position: absolute;
             top: 10px;
@@ -150,6 +194,7 @@
             cursor: pointer;
             z-index: 10;
         }
+
         .modal-character-info {
             display: flex;
             flex-direction: column;
@@ -157,34 +202,42 @@
             gap: 10px;
             margin-bottom: 20px;
         }
+
         #modal-character-image {
-            width: 300px; /* 이미지 크기 조절 */
-            height: 300px;
+            width: 200px;
+            height: 200px;
             border-radius: 20px;
             border: 3px solid var(--stroke);
             object-fit: cover;
         }
+
         #modal-title-span {
             font-size: 1.8em;
             font-weight: bold;
         }
+
         .font-size-control-group-wrapper {
             width: 100%;
             display: flex;
-            justify-content: flex-end; /* 오른쪽 정렬 */
-            padding: 0 20px 10px 20px; /* 좌우 패딩 및 아래쪽 여백 */
+            justify-content: flex-end;
+            /* 오른쪽 정렬 */
+            padding: 0 20px 10px 20px;
+            /* 좌우 패딩 및 아래쪽 여백 */
             box-sizing: border-box;
         }
+
         .font-size-control-group {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .font-size-label {
             color: var(--muted-ink);
             font-size: 1.1em;
             font-weight: bold;
         }
+
         .font-size-controller {
             display: flex;
             align-items: center;
@@ -195,6 +248,7 @@
             padding: 2px 5px;
             user-select: none;
         }
+
         .font-size-controller button {
             background: none;
             border: none;
@@ -204,32 +258,39 @@
             cursor: pointer;
             padding: 0 5px;
         }
+
         .font-size-controller button:hover {
             color: var(--ink);
         }
+
         #font-size-display {
             font-size: 1.1em;
             font-weight: bold;
             min-width: 2ch;
             text-align: center;
         }
+
         .modal-content {
             display: flex;
             gap: 20px;
-            padding: 0; /* 위쪽 padding은 popup-modal에서 처리 */
+            padding: 0;
+            /* 위쪽 padding은 popup-modal에서 처리 */
             flex: 1 1 auto;
             min-height: 0;
         }
+
         .text-field-group {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .text-field-group label {
             font-size: 1.2em;
             margin-bottom: 10px;
             color: var(--muted-ink);
         }
+
         .text-field-group textarea {
             background-color: var(--bg);
             border: 1px solid var(--stroke);
@@ -239,12 +300,34 @@
             min-height: 300px;
             resize: both;
             flex-grow: 1;
+            display: block;
         }
+
+        .textarea-wrapper {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resize-icon {
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            font-size: 18px;
+            color: var(--muted-ink);
+            pointer-events: none;
+            user-select: none;
+            transform: scaleX(-1);
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+
         .modal-footer {
             padding: 15px 20px;
             text-align: center;
             border-top: 1px solid var(--stroke);
         }
+
         .modal-confirm-btn {
             background-color: var(--accent);
             color: var(--bg);
@@ -256,19 +339,24 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         .modal-confirm-btn:hover {
             background-color: #26a26a;
         }
+
         #modal-confirm-btn:disabled {
-            background-color: var(--stroke); /* 배경색을 회색 계열로 */
-            color: var(--muted-ink); /* 글자색도 흐리게 */
-            cursor: not-allowed; /* 커서 변경 */
+            background-color: var(--stroke);
+            /* 배경색을 회색 계열로 */
+            color: var(--muted-ink);
+            /* 글자색도 흐리게 */
+            cursor: not-allowed;
+            /* 커서 변경 */
         }
+
         .text-field-group textarea::-webkit-resizer {
-            background-color: var(--ink);
-            border-left: 2px solid var(--ink);
-            border-top: 2px solid var(--ink);
+            background-color: transparent;
         }
+
         #confirm-dialog {
             display: none;
             position: fixed;
@@ -279,6 +367,7 @@
             z-index: 1002;
             animation: fadeIn 0.2s ease-out;
         }
+
         #confirm-dialog .confirm-dialog-box {
             background-color: var(--panel);
             border: 1px solid var(--stroke);
@@ -288,17 +377,20 @@
             max-width: 450px;
             width: 90%;
         }
+
         #confirm-dialog p {
             margin: 0;
             margin-bottom: 20px;
             font-size: 1.2em;
             line-height: 1.6;
         }
+
         .confirm-dialog-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
         }
+
         .confirm-dialog-buttons button {
             border-radius: 8px;
             padding: 10px 25px;
@@ -307,15 +399,18 @@
             cursor: pointer;
             border: 1px solid var(--stroke);
         }
+
         #confirm-cancel-btn {
             background-color: darkred;
             color: var(--muted-ink);
         }
+
         #confirm-final-btn {
             background-color: var(--accent);
             color: var(--bg);
             border-color: var(--accent);
         }
+
         .name-entry-modal {
             background-color: var(--panel);
             border-radius: 12px;
@@ -325,18 +420,23 @@
             text-align: center;
             border: 1px solid var(--stroke);
         }
+
         .name-entry-modal h2 {
             margin-top: 0;
-            margin-bottom: 5px; /* 여백 줄임 */
+            margin-bottom: 5px;
+            /* 여백 줄임 */
             color: var(--ink);
             font-size: 1.5em;
         }
+
         .streamer-guidance {
-            font-size: 1em; /* h2 폰트 크기의 약 50% */
+            font-size: 1.3em;
+            /* h2 폰트 크기의 약 50% */
             color: darkgreen;
             margin-top: 0;
             margin-bottom: 20px;
         }
+
         .name-entry-modal input {
             width: 100%;
             padding: 12px;
@@ -348,6 +448,7 @@
             font-size: 1.1em;
             box-sizing: border-box;
         }
+
         .name-entry-modal button {
             background-color: var(--accent);
             color: var(--bg);
@@ -360,13 +461,16 @@
             width: 100%;
             transition: background-color 0.2s;
         }
+
         .image-button.submitted {
             position: relative;
         }
+
         .image-button.submitted .image-wrapper {
             filter: grayscale(80%);
             opacity: 0.6;
         }
+
         .image-button.submitted::after {
             content: '✔';
             position: absolute;
@@ -376,30 +480,55 @@
             color: var(--accent);
             text-shadow: 0 0 5px var(--bg);
         }
+
         .name-entry-modal button:hover {
             background-color: #26a26a;
         }
+
         .error-message {
             color: #ff5c5c;
             font-size: 0.9em;
-            height: 1.2em; /* 메시지 유무에 따른 레이아웃 변경 방지 */
+            height: 1.2em;
+            /* 메시지 유무에 따른 레이아웃 변경 방지 */
             margin-top: -10px;
             margin-bottom: 10px;
-            visibility: hidden; /* 평소에는 숨김 */
+            visibility: hidden;
+            /* 평소에는 숨김 */
         }
+
         .error-message.visible {
             visibility: visible;
         }
+
         #name-input.invalid {
             animation: shake 0.5s;
             border-color: #ff5c5c;
         }
+
         @keyframes shake {
-            10%, 90% { transform: translateX(-1px); }
-            20%, 80% { transform: translateX(2px); }
-            30%, 50%, 70% { transform: translateX(-4px); }
-            40%, 60% { transform: translateX(4px); }
+
+            10%,
+            90% {
+                transform: translateX(-1px);
+            }
+
+            20%,
+            80% {
+                transform: translateX(2px);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translateX(-4px);
+            }
+
+            40%,
+            60% {
+                transform: translateX(4px);
+            }
         }
+
         #confirm-final-btn:disabled {
             background-color: #555;
             cursor: wait;
@@ -417,16 +546,19 @@
             flex-direction: column;
             position: relative;
         }
+
         .summary-modal-header {
             padding: 10px 15px;
             border-bottom: 1px solid var(--stroke);
             text-align: center;
             position: relative;
         }
+
         .summary-modal-title {
             font-size: 1.5em;
             font-weight: bold;
         }
+
         .summary-modal-close-btn {
             position: absolute;
             top: 50%;
@@ -439,11 +571,13 @@
             line-height: 1;
             cursor: pointer;
         }
+
         .summary-modal-content {
             display: flex;
             flex-grow: 1;
             overflow: hidden;
         }
+
         .summary-characters-list {
             width: 200px;
             border-right: 1px solid var(--stroke);
@@ -454,6 +588,7 @@
             gap: 5px;
             flex-shrink: 0;
         }
+
         .summary-char-button {
             display: flex;
             align-items: center;
@@ -467,62 +602,119 @@
             text-align: left;
             color: var(--ink);
         }
+
         .summary-char-button:hover {
             background-color: var(--stroke);
         }
+
         .summary-char-button.active {
             border-color: var(--accent);
             background-color: #2a2f3a80;
         }
+
         .summary-char-button img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
+
         .summary-details {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
             width: calc(100% - 220px);
         }
+
         .summary-details table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
-        .my-records-details th, .my-records-details td {
+        .my-records-details th,
+        .my-records-details td {
             width: 50%;
         }
 
-        .summary-details th, .summary-details td {
+        .summary-details th,
+        .summary-details td {
             border: 1px solid var(--stroke);
             padding: 12px;
             text-align: left;
         }
+
         .summary-details th {
             background-color: #2a2f3a80;
         }
+
         .summary-details td.col-char {
             width: 150px;
             text-align: center;
         }
+
         .summary-details td.col-char img {
             width: 80px;
             height: 80px;
             border-radius: 8px;
             object-fit: cover;
         }
+
+        #lock-veil {
+            background-color: #000;
+            z-index: 10000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+        }
+
+        .lock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .lock-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: #fff;
+        }
+
+        .lock-date {
+            font-size: 1.25em;
+            color: var(--muted-ink);
+        }
+
+        .lock-timer {
+            font-size: 1.1em;
+            padding: 10px 20px;
+            background: #1a1d24;
+            border-radius: 50px;
+            border: 1px solid var(--stroke);
+            margin-top: 10px;
+        }
     </style>
 </head>
+
 <body>
+    <!-- Access Lock Screen -->
+    <div id="lock-veil" class="modal-veil visible">
+        <div class="lock-container">
+            <div class="lock-title">COMING SOON</div>
+            <div class="lock-date">2026. 03. 03. 00:00 KST OPEN</div>
+            <div id="lock-timer" class="lock-timer">서버 시간을 확인 중입니다...</div>
+        </div>
+    </div>
     <div class="container" id="main-container">
         <div class="title-container">
-        <img src="./assets/title.png" alt="첫인상 현인상" class="title-image">
-        <span id="welcome-message"></span>
-        <p class="welcome-subtext"></p>
-    </div>
+            <img src="./assets/title.png" alt="첫인상 현인상" class="title-image">
+            <span id="welcome-message"></span>
+            <p class="welcome-subtext"></p>
+        </div>
         <!-- Content will be dynamically generated here -->
     </div>
 
@@ -556,11 +748,17 @@
             <div class="modal-content">
                 <div class="text-field-group">
                     <label for="impression-first">첫인상</label>
-                    <textarea id="impression-first"></textarea>
+                    <div class="textarea-wrapper">
+                        <textarea id="impression-first"></textarea>
+                        <span class="material-symbols-outlined resize-icon">resize_window</span>
+                    </div>
                 </div>
                 <div class="text-field-group">
                     <label for="impression-current">현인상</label>
-                    <textarea id="impression-current"></textarea>
+                    <div class="textarea-wrapper">
+                        <textarea id="impression-current"></textarea>
+                        <span class="material-symbols-outlined resize-icon">resize_window</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -618,11 +816,11 @@
             <div class="summary-modal-content">
                 <div class="summary-details">
                     <table>
-                    <colgroup>
-                        <col style="width: 10%;">
-                        <col style="width: 45%;">
-                        <col style="width: 45%;">
-                    </colgroup>
+                        <colgroup>
+                            <col style="width: 10%;">
+                            <col style="width: 45%;">
+                            <col style="width: 45%;">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th style="text-align: center;">익명</th>
@@ -638,37 +836,50 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9LhRulSzsN_Yx7u-waO1p0qpi-3C_54PEorTR_7OUIPaw6p1Bmkx7PC1cQpzAPSC80Q/exec';
+            const SERVER_URL = 'https://pland_insang_db.olhda.me';
             let userDisplayName = '';
 
             const nameMappings = [
                 { sname: "빕어", key: "bver99" },
+                { sname: "서스스", key: "vmsystem" },
                 { sname: "한세긴", key: "rose0957" },
                 { sname: "송밤", key: "s07o24" },
                 { sname: "나비", key: "navixx" },
+                { sname: "크앙희", key: "9wang2" },
                 { sname: "다니얀", key: "daniyan1030" },
-                { sname: "밤베", key: "bambe53" },
                 { sname: "밤새나", key: "bamsaena" },
-                { sname: "요코링", key: "yokoring03" },
+                { sname: "밤베", key: "bambe53" },
                 { sname: "윰로로", key: "yumroro" },
                 { sname: "찌로", key: "ch1ch1r0" },
-                { sname: "크앙희", key: "9wang2" },
                 { sname: "프하", key: "peuhaha" },
                 { sname: "호발", key: "hobal115end" },
                 { sname: "공도리", key: "swcmnb67" },
-                { sname: "도라희", key: "doraheee" },
-                { sname: "소호", key: "d0hxe823" },
                 { sname: "한세현", key: "kangturtle" },
+                { sname: "김솜냐", key: "somnnya" },
+                { sname: "도페", key: "likethis1125" },
+                { sname: "룬나", key: "runna11" },
+                { sname: "리퍼석", key: "reaper7862" },
+                { sname: "마리히", key: "marihema" },
+                { sname: "밤문", key: "gome02" },
+                { sname: "백소라", key: "whitesora" },
+                { sname: "요나카", key: "yonakayo05" },
+                { sname: "유리에", key: "imsohappycuz" },
+                { sname: "윤세람", key: "sayseram2" },
+                { sname: "지오", key: "bluejin0129" },
+                { sname: "햄쩌구", key: "zzeogoo" },
             ];
 
             const lineData = [
-                { title: "Line 1", subgroups: ["빕어"] },
-                { title: "Line 2", subgroups: ["한세긴", "송밤", "나비"] },
-                { title: "Line 3", subgroups: ["다니얀", "밤베", "밤새나", "요코링","윰로로","찌로","크앙희","프하","호발"] },
-                { title: "Line 4", subgroups: ["공도리","도라희","소호","한세현"] },  
+                { title: "연습생 3기생", subgroups: ["김솜냐", "도페", "룬나", "리퍼석", "마리히", "밤문", "백소라", "요나카", "유리에", "윤세람", "지오", "햄쩌구"] },
+                { title: "대표와 대표(였던것)", subgroups: ["빕어", "서스스"] },
+                { title: "Plan.B 정식멤버", subgroups: ["한세긴", "송밤", "나비", "크앙희"] },
+                { title: "파트너(가제)", subgroups: ["다니얀", "밤새나"] },
+                { title: "연습생 1기생", subgroups: ["밤베", "윰로로", "찌로", "프하", "호발"] },
+                { title: "연습생 2기생", subgroups: ["공도리", "한세현"] },
+
             ];
 
             const mainContainer = document.getElementById('main-container');
@@ -716,7 +927,7 @@
                 const welcomeSubtext = document.querySelector('.welcome-subtext');
                 let finalName = name;
                 const mapping = nameMappings.find(m => m.key && m.key.toLowerCase() === name.toLowerCase());
-                
+
                 if (mapping && mapping.sname) {
                     finalName = mapping.sname;
                 }
@@ -797,15 +1008,19 @@
                     nameConfirmBtn.click();
                 }
             });
-            
+
             function createSubgroupHTML(name) {
+                const mapping = nameMappings.find(m => m.sname === name);
+                const soopId = mapping ? mapping.key : name;
+                const profileUrl = `https://stimg.sooplive.co.kr/LOGO/${soopId.substring(0, 2)}/${soopId}/${soopId}.jpg`;
                 const placeholderUrl = `https://via.placeholder.com/128/1a1d24/e7eaf0?text=${name}`;
+
                 return `
                     <div class="subgroup">
                         <h3 class="subgroup-title">${name}</h3>
                         <button class="image-button" data-name="${name}">
                             <div class="image-wrapper">
-                                <img src="./assets/${name}.png" alt="${name}.png" onerror="this.onerror=null;this.src='${placeholderUrl}';">
+                                <img src="${profileUrl}" alt="${name}" onerror="this.onerror=null;this.src='${placeholderUrl}';">
                             </div>
                         </button>
                     </div>
@@ -814,7 +1029,14 @@
 
             function createLineGroupHTML(lineGroup) {
                 const subgroupsHTML = lineGroup.subgroups.map(createSubgroupHTML).join('');
-                return `<div class="line-group"><div class="line-group-content">${subgroupsHTML}</div></div>`;
+                return `
+                    <div class="line-group-wrapper">
+                        <div class="line-title">${lineGroup.title}</div>
+                        <div class="line-group">
+                            <div class="line-group-content">${subgroupsHTML}</div>
+                        </div>
+                    </div>
+                `;
             }
 
             if (mainContainer) {
@@ -822,7 +1044,7 @@
                 mainContainer.innerHTML += allLinesHTML;
             }
 
-            checkUser(); // DOM 생성 후 유저 확인
+            // checkUser(); // DOM 생성 후 유저 확인 (D-Day 체크 이후로 실행 순서 양보)
 
             const modalVeil = document.getElementById('modal-veil');
             const popupModal = document.querySelector('.popup-modal');
@@ -832,7 +1054,7 @@
             const modalConfirmBtn = document.getElementById('modal-confirm-btn');
             const firstImpressionText = document.getElementById('impression-first');
             const currentImpressionText = document.getElementById('impression-current');
-            
+
             const fontMinusBtn = document.getElementById('font-minus-btn');
             const fontPlusBtn = document.getElementById('font-plus-btn');
             const fontSizeDisplay = document.getElementById('font-size-display');
@@ -851,8 +1073,105 @@
                 currentImpressionText.style.fontSize = `${currentFontSize}px`;
             }
 
-            fontPlusBtn.addEventListener('click', () => updateFontSize(currentFontSize + 2));
-            fontMinusBtn.addEventListener('click', () => updateFontSize(currentFontSize - 2));
+            let fontTimer;
+            function startFontAdjustment(delta) {
+                stopFontAdjustment();
+                updateFontSize(currentFontSize + delta);
+                fontTimer = setTimeout(() => {
+                    fontTimer = setInterval(() => {
+                        updateFontSize(currentFontSize + delta);
+                    }, 50);
+                }, 300);
+            }
+
+            function stopFontAdjustment() {
+                clearTimeout(fontTimer);
+                clearInterval(fontTimer);
+            }
+
+            fontPlusBtn.addEventListener('mousedown', () => startFontAdjustment(2));
+            fontMinusBtn.addEventListener('mousedown', () => startFontAdjustment(-2));
+
+            [fontPlusBtn, fontMinusBtn].forEach(btn => {
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startFontAdjustment(btn === fontPlusBtn ? 2 : -2);
+                });
+                btn.addEventListener('mouseup', stopFontAdjustment);
+                btn.addEventListener('mouseleave', stopFontAdjustment);
+                btn.addEventListener('touchend', stopFontAdjustment);
+                btn.addEventListener('touchcancel', stopFontAdjustment);
+            });
+
+            // 전역 마우스업 처리로 버튼 밖에서 떼도 멈추도록 보장
+            window.addEventListener('mouseup', stopFontAdjustment);
+
+            // --- Access Control Logic (D-Day) ---
+            const lockVeil = document.getElementById('lock-veil');
+            const lockTimerDisplay = document.getElementById('lock-timer');
+            const TARGET_TIME = 1772463600000; // KST 2026-03-03 00:00:00
+
+            window.olhtest = function (val) {
+                if (val === 1) {
+                    console.log('🔓 Developer Override: Access Granted');
+                    lockVeil.classList.remove('visible');
+                    checkUser(); // 강제 오픈 시 유저 확인 실행
+                    return 'Access Granted';
+                }
+            };
+
+            async function checkAccess() {
+                try {
+                    console.log('📡 Checking server time...');
+                    const response = await fetch(`${SERVER_URL}/api/time`);
+                    const data = await response.json();
+                    const serverTime = data.timestamp;
+
+                    console.log(`🕒 Server Time: ${new Date(serverTime).toLocaleString()}`);
+                    console.log(`🎯 Target Time: ${new Date(TARGET_TIME).toLocaleString()}`);
+
+                    if (serverTime >= TARGET_TIME) {
+                        console.log('✅ Target time reached. Opening page.');
+                        lockVeil.classList.remove('visible');
+                        checkUser(); // 시간 도달 시 유저 확인 실행
+                    } else {
+                        console.log('⏳ Still waiting for target time.');
+                        lockVeil.classList.add('visible');
+                        startLockTimer(serverTime);
+                    }
+                } catch (error) {
+                    console.error('Server time check failed:', error);
+                    // 서버 연결 실패 시 보안을 위해 기본적으로 잠금 유지
+                    lockVeil.classList.add('visible');
+                    lockTimerDisplay.textContent = '서버와의 연결이 원활하지 않습니다.';
+                }
+            }
+
+            function startLockTimer(initialServerTime) {
+                let currentServerTime = initialServerTime;
+
+                const updateTimer = () => {
+                    const diff = TARGET_TIME - currentServerTime;
+                    if (diff <= 0) {
+                        lockVeil.classList.remove('visible');
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    lockTimerDisplay.textContent = `남은 시간: ${days}일 ${hours}시간 ${mins}분 ${secs}초`;
+
+                    currentServerTime += 1000;
+                    setTimeout(updateTimer, 1000);
+                };
+
+                updateTimer();
+            }
+
+            checkAccess();
 
             const syncModalSize = () => {
                 const contentStyles = window.getComputedStyle(modalContent);
@@ -860,7 +1179,7 @@
                 const contentPadding = parseFloat(contentStyles.paddingLeft) + parseFloat(contentStyles.paddingRight);
                 const newModalWidth = firstImpressionText.offsetWidth + currentImpressionText.offsetWidth + contentGap + contentPadding;
                 if (Math.abs(popupModal.offsetWidth - newModalWidth) > 1) {
-                   popupModal.style.width = `${newModalWidth}px`;
+                    popupModal.style.width = `${newModalWidth}px`;
                 }
             };
 
@@ -870,14 +1189,14 @@
             function checkConfirmButtonState() {
                 const firstLength = firstImpressionText.value.trim().length;
                 const currentLength = currentImpressionText.value.trim().length;
-                
+
                 if (firstLength > 0 && currentLength > 0) {
                     modalConfirmBtn.disabled = false;
                 } else {
                     modalConfirmBtn.disabled = true;
                 }
             }
-            
+
             const modalCharacterImage = document.getElementById('modal-character-image');
 
             function openModal(name) {
@@ -888,9 +1207,11 @@
                 }
 
                 activeName = name;
-                
+
                 // Set character image
-                const imageUrl = `./assets/${name}.png`;
+                const mapping = nameMappings.find(m => m.sname === name);
+                const soopId = mapping ? mapping.key : name;
+                const imageUrl = `https://stimg.sooplive.co.kr/LOGO/${soopId.substring(0, 2)}/${soopId}/${soopId}.jpg`;
                 const placeholderUrl = `https://via.placeholder.com/150/1a1d24/e7eaf0?text=${name}`;
                 modalCharacterImage.src = imageUrl;
                 modalCharacterImage.onerror = () => {
@@ -900,22 +1221,22 @@
 
                 // Set character name
                 modalTitleSpan.textContent = name;
-                
+
                 // Reset text fields
                 firstImpressionText.value = '';
                 currentImpressionText.value = '';
                 // 폰트 사이즈 초기화 대신 현재 설정된 폰트 사이즈 적용
                 updateFontSize(currentFontSize);
-                
+
                 popupModal.style.width = '40vw';
                 popupModal.style.height = 'auto';
 
                 modalVeil.classList.add('visible');
                 checkConfirmButtonState(); // 모달이 열릴 때 버튼 상태 초기화
-                
+
                 requestAnimationFrame(() => {
                     const initialTextWidth = firstImpressionText.offsetWidth;
-                    if(initialTextWidth > 0) {
+                    if (initialTextWidth > 0) {
                         firstImpressionText.style.minWidth = `${initialTextWidth}px`;
                         currentImpressionText.style.minWidth = `${initialTextWidth}px`;
                         resizeObserver.observe(firstImpressionText);
@@ -940,7 +1261,7 @@
                     el.style.fontSize = '';
                     el.style.height = ''; // 높이 스타일 초기화 추가
                 });
-                
+
                 popupModal.style.width = ''; // 모달 가로 크기 초기화
                 popupModal.style.height = ''; // 모달 세로 크기 초기화
             }
@@ -964,11 +1285,8 @@
                     submitter: userDisplayName
                 };
 
-                if (!GAS_URL) {
-                    alert('Google Apps Script URL이 설정되지 않았습니다.');
-                    closeConfirmDialog();
-                    return;
-                }
+                // 데이터 저장 로직은 이미 SERVER_URL 기반 fetch를 사용하도록 되어 있습니다.
+                // 이전 GAS_URL 체크 로직이 남아있어 에러가 발생한 것이므로 이를 정리합니다.
 
                 if (userDisplayName.toLowerCase() !== 'dev') {
                     const submittedKey = `submitted_${userDisplayName}_${activeName}`;
@@ -988,37 +1306,45 @@
                 const originalBtnText = confirmFinalBtn.textContent;
                 confirmFinalBtn.textContent = '저장 중...';
 
-                fetch(GAS_URL, {
+                fetch(`${SERVER_URL}/api/impressions`, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(dataToSave)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        character_name: activeName,
+                        first_impression: firstImpressionText.value,
+                        current_impression: currentImpressionText.value,
+                        submitter_id: userDisplayName
+                    })
                 })
-                .then(() => {
-                    alert('저장되었습니다!');
-                    if (userDisplayName.toLowerCase() !== 'dev') {
-                        const submittedKey = `submitted_${userDisplayName}_${activeName}`;
-                        try {
-                            localStorage.setItem(submittedKey, 'true');
-                            updateSubmittedStatus(); // 제출 후 즉시 상태 업데이트
-                        } catch(e) {
-                             console.error("Local storage is unavailable.", e);
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('저장되었습니다!');
+                            if (userDisplayName.toLowerCase() !== 'dev') {
+                                const submittedKey = `submitted_${userDisplayName}_${activeName}`;
+                                try {
+                                    localStorage.setItem(submittedKey, 'true');
+                                    updateSubmittedStatus();
+                                } catch (e) {
+                                    console.error("Local storage is unavailable.", e);
+                                }
+                            }
+                        } else {
+                            throw new Error(result.error || '저장 실패');
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('오류가 발생했습니다: ' + error);
-                })
-                .finally(() => {
-                    // 로딩 종료: 버튼 활성화 및 텍스트 복원
-                    confirmFinalBtn.disabled = false;
-                    confirmCancelBtn.disabled = false;
-                    confirmFinalBtn.textContent = originalBtnText;
-                    closeConfirmDialog();
-                    closeModal();
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('오류가 발생했습니다: ' + error);
+                    })
+                    .finally(() => {
+                        // 로딩 종료: 버튼 활성화 및 텍스트 복원
+                        confirmFinalBtn.disabled = false;
+                        confirmCancelBtn.disabled = false;
+                        confirmFinalBtn.textContent = originalBtnText;
+                        closeConfirmDialog();
+                        closeModal();
+                    });
             });
 
             confirmCancelBtn.addEventListener('click', closeConfirmDialog);
@@ -1066,18 +1392,22 @@
                     summaryDetailsTbody.innerHTML = '<tr><td colspan="2" style="text-align: center;">아직 작성한 기록이 없습니다.</td></tr>';
                     return;
                 }
-                
+
                 // 캐릭터 목록 생성 (중복 제거)
                 const characters = [...new Set(submissions.map(s => s.character))];
-                
+
                 characters.forEach(charName => {
                     const charButton = document.createElement('button');
                     charButton.className = 'summary-char-button';
-                    charButton.innerHTML = `<img src="./assets/${charName}.png" alt="${charName}"><span>${charName}</span>`;
+                    const mapping = nameMappings.find(m => m.sname === charName);
+                    const soopId = mapping ? mapping.key : charName;
+                    const profileUrl = `https://stimg.sooplive.co.kr/LOGO/${soopId.substring(0, 2)}/${soopId}/${soopId}.jpg`;
+
+                    charButton.innerHTML = `<img src="${profileUrl}" alt="${charName}" onerror="this.onerror=null;this.src='https://via.placeholder.com/40/1a1d24/e7eaf0?text=${charName}';"><span>${charName}</span>`;
                     charButton.onclick = () => filterSummaryTable(submissions, charName);
                     summaryCharList.appendChild(charButton);
                 });
-                
+
                 // 첫 번째 캐릭터의 데이터로 테이블 기본 채우기
                 if (characters.length > 0) {
                     filterSummaryTable(submissions, characters[0]);
@@ -1119,40 +1449,28 @@
             let isFetchingSummary = false; // 요약 데이터 요청 상태 플래그
 
             function fetchSummaryData() {
-                if (!userDisplayName || isFetchingSummary) return; // 이미 요청 중이면 중복 실행 방지
+                if (!userDisplayName || isFetchingSummary) return;
 
-                isFetchingSummary = true; // 요청 시작
+                isFetchingSummary = true;
                 summaryCharList.innerHTML = '<p>로딩 중...</p>';
                 summaryDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">로딩 중...</td></tr>';
-                
-                const callbackName = 'handleSummaryData';
-                window[callbackName] = function(result) {
-                    try {
+
+                fetch(`${SERVER_URL}/api/my-records/${encodeURIComponent(userDisplayName)}`)
+                    .then(response => response.json())
+                    .then(result => {
                         if (result.status === 'success') {
                             renderSummaryModal(result.data);
                         } else {
                             throw new Error(result.message || 'Failed to fetch data.');
                         }
-                    } finally {
-                        // Clean up and reset flag
+                    })
+                    .catch(error => {
+                        summaryDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+                        console.error('Summary fetch error:', error);
+                    })
+                    .finally(() => {
                         isFetchingSummary = false;
-                        document.body.removeChild(script);
-                        delete window[callbackName];
-                    }
-                };
-
-                const script = document.createElement('script');
-                script.src = `${GAS_URL}?user=${encodeURIComponent(userDisplayName)}&callback=${callbackName}`;
-                
-                script.onerror = () => {
-                    summaryDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다. 스크립트 로드에 실패했습니다.</td></tr>`;
-                    // Clean up and reset flag on error
-                    isFetchingSummary = false;
-                    document.body.removeChild(script);
-                    delete window[callbackName];
-                };
-                
-                document.body.appendChild(script);
+                    });
             }
 
             function openSummaryModal() {
@@ -1191,32 +1509,22 @@
                 isFetchingImpressions = true;
                 impressionDetailsTbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">로딩 중...</td></tr>';
 
-                const callbackName = 'handleImpressionData';
-                window[callbackName] = function(result) {
-                    try {
+                fetch(`${SERVER_URL}/api/impressions/${encodeURIComponent(characterName)}`)
+                    .then(response => response.json())
+                    .then(result => {
                         if (result.status === 'success') {
                             renderImpressionDetails(result.data);
                         } else {
                             throw new Error(result.message || 'Failed to fetch data.');
                         }
-                    } finally {
+                    })
+                    .catch(error => {
+                        impressionDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+                        console.error('Impression fetch error:', error);
+                    })
+                    .finally(() => {
                         isFetchingImpressions = false;
-                        document.body.removeChild(script);
-                        delete window[callbackName];
-                    }
-                };
-
-                const script = document.createElement('script');
-                script.src = `${GAS_URL}?action=getImpressions&character=${encodeURIComponent(characterName)}&callback=${callbackName}`;
-                
-                script.onerror = () => {
-                    impressionDetailsTbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
-                    isFetchingImpressions = false;
-                    document.body.removeChild(script);
-                    delete window[callbackName];
-                };
-                
-                document.body.appendChild(script);
+                    });
             }
 
             function renderImpressionDetails(data) {
@@ -1242,4 +1550,5 @@
         });
     </script>
 </body>
-</htmhttps://script.google.com/macros/s/AKfycbw9LhRulSzsN_Yx7u-waO1p0qpi-3C_54PEorTR_7OUIPaw6p1Bmkx7PC1cQpzAPSC80Q/exec>
+
+</html>
