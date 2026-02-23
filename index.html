@@ -43,7 +43,7 @@
         }
 
         .title-image {
-            max-width: 350px;
+            max-width: 400px;
             width: 100%;
         }
 
@@ -712,9 +712,13 @@
     <div class="container" id="main-container">
         <div class="title-container">
             <img src="./assets/title.png" alt="첫인상 현인상" class="title-image">
+        </div>
+        <hr class="line-separator">
+        <div class="title-container" id="welcome-container" style="cursor: pointer;">
             <span id="welcome-message"></span>
             <p class="welcome-subtext"></p>
         </div>
+        <hr class="line-separator">
         <!-- Content will be dynamically generated here -->
     </div>
 
@@ -1380,7 +1384,7 @@
             // --- Summary Modal Logic ---
             const summaryModalVeil = document.getElementById('summary-modal-veil');
             const summaryModalCloseBtn = document.getElementById('summary-modal-close-btn');
-            const welcomeContainer = document.querySelector('.title-container');
+            const welcomeContainer = document.getElementById('welcome-container');
             const summaryCharList = document.querySelector('.summary-characters-list');
             const summaryDetailsTbody = document.querySelector('.summary-details tbody');
 
