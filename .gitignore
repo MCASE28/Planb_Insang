@@ -1,0 +1,11 @@
+# 모든 파일 및 디렉토리 제외
+/*
+
+# index.html 허용
+!/index.html
+
+# assets 디렉토리 및 하위 내용 허용
+!/assets/
+
+# .gitignore 자체도 포함 (추적 가능하게)
+!/.gitignore
